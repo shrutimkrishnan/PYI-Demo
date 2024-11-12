@@ -8,7 +8,7 @@ st.set_page_config(layout="wide")
 # Read the CSV file from the public S3 URL
 data = pd.read_csv("https://behaviorally-testing.s3.amazonaws.com/sankey_relevant_session_v2.csv")
 
-st.title("PYI Demo Sankey")
+st.title("PYI Demo")
 st.write("Sankey Diagram of Participant Journeys")
 
 # App selection dropdown
@@ -179,20 +179,17 @@ if selected_app:
             value.append(1)  # Each transition has a value of 1
             link_colors.append("lightgrey")  # Transition color
 
-# Create the Sankey diagram
+# Create the Sankey diagram without the 'font' parameter in node
 fig = go.Figure(go.Sankey(
     node=dict(
         pad=20,
         thickness=20,
-        line=dict(color="rgba(0,0,0,0)", width=0.5),  # Remove border outline
+        # Remove the black outline for better contrast
+        line=dict(color="rgba(0,0,0,0)", width=0),
         label=[label.split("_")[1] if "_" in label else label for label in node_labels],
         color=node_colors,
-        customdata=node_labels,
-        hovertemplate='%{customdata}<extra></extra>',
-        hoverlabel=dict(
-            bgcolor='black',
-            font=dict(size=14, color='white')  # White text on black background for hover
-        )
+        # Set a more readable font color
+        hoverlabel=dict(font=dict(color='white')),
     ),
     link=dict(
         source=source,
@@ -202,16 +199,16 @@ fig = go.Figure(go.Sankey(
     )
 ))
 
-# Update layout for better readability
+# Update layout to control font settings globally and set the width of the figure
 fig.update_layout(
     title_text="E-commerce Purchase Journeys (First 5 steps, Last 5 steps only)",
-    width=1600,
-    height=900,
     font=dict(
-        size=14,
-        color='black'  # Set default font color to black for high contrast
-    )
+        size=16,
+        color="white"  # Change to white for better contrast against darker backgrounds
+    ),
+    width=1600,
+    height=900
 )
 
-# Display the Sankey diagram in Streamlit
+# Display the Sankey diagram in Streamlit with full width
 st.plotly_chart(fig, use_container_width=True)
